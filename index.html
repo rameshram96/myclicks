@@ -17,16 +17,27 @@
     body { background: var(--cream); color: var(--bark); font-family: 'Crimson Text', Georgia, serif; font-size: 18px; line-height: 1.6; overflow-x: hidden; }
     body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); opacity: 0.04; pointer-events: none; z-index: 9999; }
 
-    #setup-banner { background: var(--bark); color: var(--cream); padding: 0.85rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; font-size: 0.9rem; }
-    #setup-banner span { opacity: 0.8; }
-    #setup-banner .setup-actions { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
-    #pat-input { padding: 0.4rem 0.75rem; font-family: 'Crimson Text', serif; font-size: 0.9rem; border: 1px solid var(--sand); background: rgba(255,255,255,0.1); color: var(--cream); width: 260px; outline: none; }
-    #pat-input::placeholder { color: rgba(245,240,232,0.4); }
-    .banner-btn { padding: 0.4rem 1.1rem; background: var(--sand); color: var(--bark); border: none; font-family: 'Crimson Text', serif; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
-    .banner-btn:hover { background: var(--cream); }
-    #pat-status { font-size: 0.8rem; padding: 0.3rem 0.7rem; border-radius: 2px; }
-    #pat-status.ok { background: var(--moss); color: #fff; }
-    #pat-status.err { background: var(--dusty); color: #fff; }
+    /* ── ADMIN LOGIN MODAL ── */
+    #admin-modal { display: none; position: fixed; inset: 0; background: rgba(15,8,3,0.85); z-index: 3000; justify-content: center; align-items: center; animation: fadeIn 0.25s ease; }
+    #admin-modal.active { display: flex; }
+    .admin-box { background: var(--warm-white); padding: 2.5rem; width: 360px; max-width: 92vw; position: relative; }
+    .admin-box h3 { font-family: 'Playfair Display', serif; font-weight: 400; font-size: 1.4rem; margin-bottom: 0.4rem; }
+    .admin-box p { font-size: 0.9rem; color: var(--earth); font-style: italic; margin-bottom: 1.5rem; }
+    .admin-box input { width: 100%; border: 1px solid var(--sand); background: var(--cream); padding: 0.65rem 0.9rem; font-family: 'Crimson Text', serif; font-size: 1rem; color: var(--bark); outline: none; margin-bottom: 0.5rem; display: block; }
+    .admin-box input:focus { border-color: var(--earth); }
+    .admin-error { font-size: 0.82rem; color: var(--dusty); min-height: 1.2rem; margin-bottom: 0.75rem; }
+    .admin-actions { display: flex; gap: 0.75rem; justify-content: flex-end; }
+    .admin-close { position: absolute; top: 1rem; right: 1.1rem; background: none; border: none; font-size: 1.2rem; color: var(--sand); cursor: pointer; }
+    .admin-close:hover { color: var(--bark); }
+
+    /* ── ADMIN BAR (shown when logged in) ── */
+    #admin-bar { display: none; background: var(--bark); color: var(--cream); padding: 0.65rem 1.5rem; font-size: 0.82rem; letter-spacing: 0.1em; text-transform: uppercase; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    #admin-bar.active { display: flex; }
+    #admin-bar span { opacity: 0.75; }
+    .admin-bar-right { display: flex; gap: 1rem; align-items: center; }
+    .bar-btn { background: none; border: 1px solid rgba(196,168,130,0.4); color: var(--sand); padding: 0.3rem 0.9rem; font-family: 'Crimson Text', serif; font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+    .bar-btn:hover { background: rgba(196,168,130,0.15); color: var(--cream); }
+    .bar-btn.danger:hover { background: var(--dusty); border-color: var(--dusty); color: #fff; }
 
     header { padding: 4rem 2rem 2rem; text-align: center; }
     header::after { content: ''; display: block; width: 60px; height: 1px; background: var(--sand); margin: 2rem auto 0; }
@@ -39,6 +50,8 @@
     nav a::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 1px; background: var(--dusty); transform: scaleX(0); transform-origin: left; transition: transform 0.3s ease; }
     nav a:hover { color: var(--bark); }
     nav a:hover::after { transform: scaleX(1); }
+    #nav-upload { display: none; }
+    #nav-upload.active { display: inline; }
 
     .intro { max-width: 540px; margin: 2rem auto; padding: 0 2rem; text-align: center; font-size: 1.1rem; color: var(--earth); font-style: italic; line-height: 1.9; opacity: 0; animation: fadeUp 1s ease 0.3s forwards; }
 
@@ -61,13 +74,16 @@
     .photo-card:hover .photo-info { opacity: 1; transform: translateY(0); }
     .photo-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-style: italic; color: var(--cream); display: block; }
     .photo-meta { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sand); margin-top: 0.2rem; display: block; }
-    .delete-btn { position: absolute; top: 8px; right: 8px; background: rgba(20,10,3,0.6); color: var(--cream); border: none; width: 28px; height: 28px; font-size: 0.75rem; cursor: pointer; z-index: 4; opacity: 0; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; }
-    .photo-card:hover .delete-btn { opacity: 1; }
+    .delete-btn { position: absolute; top: 8px; right: 8px; background: rgba(20,10,3,0.6); color: var(--cream); border: none; width: 28px; height: 28px; font-size: 0.75rem; cursor: pointer; z-index: 4; opacity: 0; transition: opacity 0.2s; display: none; align-items: center; justify-content: center; }
+    .admin-mode .photo-card:hover .delete-btn { opacity: 1; }
+    .admin-mode .delete-btn { display: flex; }
     .delete-btn:hover { background: var(--dusty); }
 
-    .upload-section { padding: 4rem 2rem; text-align: center; border-top: 1px solid rgba(122,92,58,0.15); }
-    .upload-section h2 { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 400; margin-bottom: 0.4rem; }
-    .upload-section p { color: var(--earth); font-style: italic; margin-bottom: 2rem; font-size: 1rem; }
+    /* ── UPLOAD (hidden by default) ── */
+    #upload-section { display: none; padding: 4rem 2rem; text-align: center; border-top: 1px solid rgba(122,92,58,0.15); }
+    #upload-section.active { display: block; }
+    #upload-section h2 { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 400; margin-bottom: 0.4rem; }
+    #upload-section p { color: var(--earth); font-style: italic; margin-bottom: 2rem; font-size: 1rem; }
     .upload-zone { border: 1.5px dashed var(--sand); border-radius: 4px; padding: 3rem 2rem; max-width: 520px; margin: 0 auto; cursor: pointer; transition: background 0.3s, border-color 0.3s; background: rgba(196,168,130,0.05); }
     .upload-zone:hover, .upload-zone.drag-over { background: rgba(196,168,130,0.12); border-color: var(--earth); }
     .upload-icon { font-size: 2rem; margin-bottom: 0.75rem; display: block; color: var(--sand); }
@@ -75,6 +91,8 @@
     #file-input { display: none; }
     .btn { display: inline-block; margin-top: 1.5rem; padding: 0.7rem 2rem; font-family: 'Crimson Text', serif; font-size: 0.9rem; letter-spacing: 0.12em; text-transform: uppercase; background: var(--earth); color: var(--cream); border: none; cursor: pointer; transition: background 0.3s; }
     .btn:hover { background: var(--bark); }
+    .btn-outline { padding: 0.5rem 1.25rem; font-family: 'Crimson Text', serif; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; background: transparent; color: var(--earth); border: 1px solid var(--sand); cursor: pointer; transition: all 0.2s; }
+    .btn-outline:hover { background: var(--earth); color: var(--cream); border-color: var(--earth); }
     #upload-progress { max-width: 520px; margin: 1.5rem auto 0; display: none; }
     .progress-bar-wrap { height: 3px; background: rgba(196,168,130,0.3); border-radius: 2px; overflow: hidden; }
     .progress-bar { height: 100%; background: var(--earth); width: 0%; transition: width 0.3s ease; }
@@ -100,8 +118,6 @@
     .caption-box input { width: 100%; border: 1px solid var(--sand); background: var(--cream); padding: 0.6rem 0.8rem; font-family: 'Crimson Text', serif; font-size: 1rem; color: var(--bark); outline: none; margin-bottom: 0.75rem; display: block; }
     .caption-box input:focus { border-color: var(--earth); }
     .caption-box-actions { display: flex; gap: 0.75rem; justify-content: flex-end; }
-    .btn-outline { padding: 0.5rem 1.25rem; font-family: 'Crimson Text', serif; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; background: transparent; color: var(--earth); border: 1px solid var(--sand); cursor: pointer; transition: all 0.2s; }
-    .btn-outline:hover { background: var(--earth); color: var(--cream); border-color: var(--earth); }
 
     #toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(10px); background: var(--bark); color: var(--cream); padding: 0.7rem 1.5rem; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0; transition: opacity 0.3s, transform 0.3s; z-index: 5000; pointer-events: none; white-space: nowrap; }
     #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -116,15 +132,32 @@
 </head>
 <body>
 
-<div id="setup-banner">
-  <span>🔑 Enter your GitHub Personal Access Token to enable uploads</span>
-  <div class="setup-actions">
-    <input type="password" id="pat-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
-    <button class="banner-btn" onclick="savePAT()">Save Token</button>
-    <span id="pat-status" style="display:none"></span>
+<!-- ── ADMIN LOGIN MODAL ── -->
+<div id="admin-modal">
+  <div class="admin-box">
+    <button class="admin-close" onclick="closeAdminModal()">✕</button>
+    <h3>Admin Access</h3>
+    <p>Enter your password and GitHub token to manage the gallery.</p>
+    <input type="password" id="admin-password" placeholder="Password" autocomplete="off"/>
+    <input type="password" id="admin-pat" placeholder="GitHub Personal Access Token (ghp_…)" autocomplete="off"/>
+    <div class="admin-error" id="admin-error"></div>
+    <div class="admin-actions">
+      <button class="btn-outline" onclick="closeAdminModal()">Cancel</button>
+      <button class="btn" onclick="submitAdminLogin()">Unlock</button>
+    </div>
   </div>
 </div>
 
+<!-- ── ADMIN BAR (visible only when logged in) ── -->
+<div id="admin-bar">
+  <span>⚙ Admin mode active</span>
+  <div class="admin-bar-right">
+    <button class="bar-btn" onclick="document.getElementById('upload-section').scrollIntoView({behavior:'smooth'})">+ Upload Photo</button>
+    <button class="bar-btn danger" onclick="logoutAdmin()">Lock &amp; Exit</button>
+  </div>
+</div>
+
+<!-- ── LIGHTBOX ── -->
 <div class="lightbox" id="lightbox">
   <button class="lightbox-close" onclick="closeLightbox()">✕</button>
   <button class="lightbox-nav prev" onclick="navigateLightbox(-1)">&#8592;</button>
@@ -136,6 +169,7 @@
   <button class="lightbox-nav next" onclick="navigateLightbox(1)">&#8594;</button>
 </div>
 
+<!-- ── CAPTION MODAL ── -->
 <div class="caption-modal" id="caption-modal">
   <div class="caption-box">
     <h3>Add a caption</h3>
@@ -148,8 +182,10 @@
   </div>
 </div>
 
+<!-- ── TOAST ── -->
 <div id="toast"></div>
 
+<!-- ── HEADER ── -->
 <header>
   <h1 class="site-title">My<em>Clicks</em></h1>
   <p class="site-tagline">Landscape &amp; Nature · Ramesh Ramasamy</p>
@@ -157,7 +193,7 @@
 
 <nav>
   <a href="#gallery">Gallery</a>
-  <a href="#upload">Add Photo</a>
+  <a href="#upload-section" id="nav-upload">Add Photo</a>
 </nav>
 
 <p class="intro">
@@ -165,13 +201,15 @@
   forests, ridgelines, rivers, and open skies.
 </p>
 
+<!-- ── GALLERY ── -->
 <section class="gallery-section" id="gallery">
   <div class="section-label">Portfolio</div>
   <div id="gallery-status">Loading photos…</div>
   <div class="gallery-grid" id="gallery-grid"></div>
 </section>
 
-<section class="upload-section" id="upload">
+<!-- ── UPLOAD (admin only) ── -->
+<section id="upload-section">
   <h2>Add a Photo</h2>
   <p>Upload from your computer — saved permanently to the gallery.</p>
   <div class="upload-zone" id="upload-zone">
@@ -187,51 +225,117 @@
   <button class="btn" onclick="document.getElementById('file-input').click()">Browse Photos</button>
 </section>
 
+<!-- ── FOOTER ── -->
 <footer>
   <em>MyClicks</em><br/><br/>
   All photographs &copy; Ramesh Ramasamy &mdash; All rights reserved
 </footer>
 
 <script>
-  const OWNER = 'rameshram96';
-  const REPO  = 'myclicks';
-  const BRANCH = 'main';
+  // ── CONFIG ──
+  const OWNER       = 'rameshram96';
+  const REPO        = 'myclicks';
+  const BRANCH      = 'main';
   const PHOTOS_JSON = 'photos.json';
   const PHOTOS_DIR  = 'photos';
 
+  // !! SET YOUR PASSWORD HERE !!
+  // Change "your-secret-password" to whatever password you want
+  const ADMIN_PASSWORD = 'dont_do_this_bro';
+
+  // ── STATE ──
   let photos = [];
   let currentIndex = 0;
   let pendingFiles = [];
   let pendingQueue = [];
   let pat = '';
+  let isAdmin = false;
 
-  function savePAT() {
-    const val = document.getElementById('pat-input').value.trim();
-    if (!val) { showToast('Please enter your token', true); return; }
-    pat = val;
-    verifyPAT();
+  // ── KEYBOARD SHORTCUT: press 'A' to open admin login ──
+  document.addEventListener('keydown', function(e) {
+    // Only trigger if not typing in an input field
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === 'a' || e.key === 'A') {
+      if (!isAdmin) openAdminModal();
+    }
+  });
+
+  // ── ADMIN MODAL ──
+  function openAdminModal() {
+    document.getElementById('admin-password').value = '';
+    document.getElementById('admin-pat').value = '';
+    document.getElementById('admin-error').textContent = '';
+    document.getElementById('admin-modal').classList.add('active');
+    setTimeout(function() { document.getElementById('admin-password').focus(); }, 100);
   }
 
-  async function verifyPAT() {
-    const status = document.getElementById('pat-status');
-    status.style.display = 'inline';
-    status.className = '';
-    status.textContent = 'Checking…';
+  function closeAdminModal() {
+    document.getElementById('admin-modal').classList.remove('active');
+  }
+
+  document.getElementById('admin-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeAdminModal();
+  });
+
+  // Allow Enter key to submit login
+  document.getElementById('admin-pat').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') submitAdminLogin();
+  });
+
+  async function submitAdminLogin() {
+    const pwd     = document.getElementById('admin-password').value;
+    const patVal  = document.getElementById('admin-pat').value.trim();
+    const errEl   = document.getElementById('admin-error');
+
+    if (pwd !== ADMIN_PASSWORD) {
+      errEl.textContent = 'Incorrect password.';
+      document.getElementById('admin-password').value = '';
+      document.getElementById('admin-password').focus();
+      return;
+    }
+
+    if (!patVal) {
+      errEl.textContent = 'Please enter your GitHub token.';
+      return;
+    }
+
+    errEl.textContent = 'Verifying token…';
+    pat = patVal;
+
     try {
       const r = await ghFetch('https://api.github.com/repos/' + OWNER + '/' + REPO);
-      if (r.ok) {
-        status.className = 'ok';
-        status.textContent = '✓ Connected';
-        document.getElementById('pat-input').value = '';
-        showToast('Token saved — you can now upload photos');
-      } else { throw new Error(); }
+      if (!r.ok) throw new Error();
     } catch {
-      status.className = 'err';
-      status.textContent = '✗ Invalid token';
+      errEl.textContent = 'Invalid GitHub token.';
       pat = '';
+      return;
     }
+
+    // Success
+    isAdmin = true;
+    closeAdminModal();
+    enableAdminMode();
+    showToast('Admin mode unlocked');
   }
 
+  function enableAdminMode() {
+    document.getElementById('admin-bar').classList.add('active');
+    document.getElementById('upload-section').classList.add('active');
+    document.getElementById('nav-upload').classList.add('active');
+    document.body.classList.add('admin-mode');
+  }
+
+  function logoutAdmin() {
+    isAdmin = false;
+    pat = '';
+    document.getElementById('admin-bar').classList.remove('active');
+    document.getElementById('upload-section').classList.remove('active');
+    document.getElementById('nav-upload').classList.remove('active');
+    document.body.classList.remove('admin-mode');
+    showToast('Admin mode locked');
+  }
+
+  // ── GITHUB API ──
   function ghFetch(url, options) {
     options = options || {};
     return fetch(url, Object.assign({}, options, {
@@ -243,6 +347,7 @@
     }));
   }
 
+  // ── LOAD GALLERY (public, no token needed) ──
   async function loadGallery() {
     const status = document.getElementById('gallery-status');
     try {
@@ -250,14 +355,14 @@
         'https://api.github.com/repos/' + OWNER + '/' + REPO + '/contents/' + PHOTOS_JSON,
         { headers: { 'Accept': 'application/vnd.github.v3+json' } }
       );
-      if (r.status === 404) { status.textContent = 'No photos yet — add your first one below!'; return; }
+      if (r.status === 404) { status.textContent = 'No photos yet — check back soon!'; return; }
       const data = await r.json();
       const json = JSON.parse(atob(data.content.replace(/\n/g, '')));
       photos = json.photos || [];
       status.style.display = 'none';
       renderGallery();
     } catch(e) {
-      status.textContent = 'Could not load photos. Make sure GitHub Pages is enabled on the myclicks repo.';
+      status.textContent = 'Could not load photos.';
     }
   }
 
@@ -265,9 +370,9 @@
     const grid = document.getElementById('gallery-grid');
     grid.innerHTML = '';
     if (photos.length === 0) {
-      const s = document.getElementById('gallery-status');
+      var s = document.getElementById('gallery-status');
       s.style.display = 'block';
-      s.textContent = 'No photos yet — add your first one below!';
+      s.textContent = 'No photos yet — check back soon!';
       return;
     }
     photos.forEach(function(p, i) { grid.appendChild(createCard(p, i)); });
@@ -290,6 +395,7 @@
     return card;
   }
 
+  // ── LIGHTBOX ──
   function openLightbox(index) {
     currentIndex = index;
     renderLightbox();
@@ -317,12 +423,14 @@
 
   document.getElementById('lightbox').addEventListener('click', function(e) { if (e.target === this) closeLightbox(); });
   document.addEventListener('keydown', function(e) {
-    if (!document.getElementById('lightbox').classList.contains('active')) return;
-    if (e.key === 'Escape') closeLightbox();
-    if (e.key === 'ArrowLeft') navigateLightbox(-1);
-    if (e.key === 'ArrowRight') navigateLightbox(1);
+    if (document.getElementById('lightbox').classList.contains('active')) {
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') navigateLightbox(-1);
+      if (e.key === 'ArrowRight') navigateLightbox(1);
+    }
   });
 
+  // ── UPLOAD ──
   const uploadZone = document.getElementById('upload-zone');
   const fileInput  = document.getElementById('file-input');
   uploadZone.addEventListener('click', function() { fileInput.click(); });
@@ -332,7 +440,7 @@
   fileInput.addEventListener('change', function() { handleFiles(fileInput.files); fileInput.value = ''; });
 
   function handleFiles(files) {
-    if (!pat) { showToast('Please enter your GitHub token first', true); return; }
+    if (!isAdmin) return;
     pendingQueue = Array.from(files);
     processNextInQueue();
   }
@@ -340,19 +448,15 @@
   function processNextInQueue() {
     if (pendingQueue.length === 0) return;
     pendingFiles = [pendingQueue[0]];
-    showCaptionModal(pendingQueue[0].name);
-  }
-
-  function showCaptionModal(filename) {
-    const guessed = filename.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+    var guessed = pendingQueue[0].name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
     document.getElementById('caption-title').value = guessed;
     document.getElementById('caption-location').value = '';
     document.getElementById('caption-modal').classList.add('active');
   }
 
   function saveCaption() {
-    const title    = document.getElementById('caption-title').value.trim() || 'Untitled';
-    const location = document.getElementById('caption-location').value.trim();
+    var title    = document.getElementById('caption-title').value.trim() || 'Untitled';
+    var location = document.getElementById('caption-location').value.trim();
     document.getElementById('caption-modal').classList.remove('active');
     uploadFile(pendingFiles[0], title, location);
     pendingQueue.shift();
@@ -367,16 +471,16 @@
   async function uploadFile(file, title, location) {
     setProgress(0, 'Uploading ' + file.name + '…');
     try {
-      const base64 = await fileToBase64(file);
+      var base64 = await fileToBase64(file);
       setProgress(25, 'Pushing image to GitHub…');
-      const ext = file.name.split('.').pop();
-      const safeName = Date.now() + '_' + title.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '') + '.' + ext;
-      const filePath = PHOTOS_DIR + '/' + safeName;
-      const uploadResp = await ghFetch(
+      var ext = file.name.split('.').pop();
+      var safeName = Date.now() + '_' + title.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '') + '.' + ext;
+      var filePath = PHOTOS_DIR + '/' + safeName;
+      var uploadResp = await ghFetch(
         'https://api.github.com/repos/' + OWNER + '/' + REPO + '/contents/' + filePath,
         { method: 'PUT', body: JSON.stringify({ message: 'Add photo: ' + title, content: base64, branch: BRANCH }) }
       );
-      if (!uploadResp.ok) { const err = await uploadResp.json(); throw new Error(err.message || 'Upload failed'); }
+      if (!uploadResp.ok) { var err = await uploadResp.json(); throw new Error(err.message || 'Upload failed'); }
       setProgress(65, 'Updating gallery index…');
       await updatePhotosJSON({ path: filePath, title: title, location: location, date: new Date().toISOString().split('T')[0] });
       setProgress(100, 'Done!');
@@ -389,34 +493,34 @@
   }
 
   async function updatePhotosJSON(newEntry) {
-    let sha = null;
-    let existingPhotos = [];
-    const r = await ghFetch('https://api.github.com/repos/' + OWNER + '/' + REPO + '/contents/' + PHOTOS_JSON);
+    var sha = null;
+    var existingPhotos = [];
+    var r = await ghFetch('https://api.github.com/repos/' + OWNER + '/' + REPO + '/contents/' + PHOTOS_JSON);
     if (r.ok) {
-      const data = await r.json();
+      var data = await r.json();
       sha = data.sha;
       try { existingPhotos = JSON.parse(atob(data.content.replace(/\n/g, ''))).photos || []; } catch {}
     }
     existingPhotos.push(newEntry);
-    const body = { message: 'Update gallery: add ' + newEntry.title, content: btoa(JSON.stringify({ photos: existingPhotos }, null, 2)), branch: BRANCH };
+    var body = { message: 'Update gallery: add ' + newEntry.title, content: btoa(JSON.stringify({ photos: existingPhotos }, null, 2)), branch: BRANCH };
     if (sha) body.sha = sha;
-    const resp = await ghFetch('https://api.github.com/repos/' + OWNER + '/' + REPO + '/contents/' + PHOTOS_JSON, { method: 'PUT', body: JSON.stringify(body) });
-    if (!resp.ok) { const err = await resp.json(); throw new Error(err.message || 'Could not update photos.json'); }
+    var resp = await ghFetch('https://api.github.com/repos/' + OWNER + '/' + REPO + '/contents/' + PHOTOS_JSON, { method: 'PUT', body: JSON.stringify(body) });
+    if (!resp.ok) { var err = await resp.json(); throw new Error(err.message || 'Could not update photos.json'); }
   }
 
   async function deletePhoto(index) {
-    if (!pat) { showToast('Enter your token to delete photos', true); return; }
+    if (!isAdmin) return;
     if (!confirm('Delete "' + (photos[index].title || 'this photo') + '"?')) return;
-    const p = photos[index];
+    var p = photos[index];
     try {
-      const r = await ghFetch('https://api.github.com/repos/' + OWNER + '/' + REPO + '/contents/' + p.path);
+      var r = await ghFetch('https://api.github.com/repos/' + OWNER + '/' + REPO + '/contents/' + p.path);
       if (!r.ok) throw new Error('Could not find file');
-      const data = await r.json();
+      var data = await r.json();
       await ghFetch('https://api.github.com/repos/' + OWNER + '/' + REPO + '/contents/' + p.path,
         { method: 'DELETE', body: JSON.stringify({ message: 'Delete photo: ' + p.title, sha: data.sha, branch: BRANCH }) });
       photos.splice(index, 1);
-      const jr = await ghFetch('https://api.github.com/repos/' + OWNER + '/' + REPO + '/contents/' + PHOTOS_JSON);
-      const jdata = await jr.json();
+      var jr = await ghFetch('https://api.github.com/repos/' + OWNER + '/' + REPO + '/contents/' + PHOTOS_JSON);
+      var jdata = await jr.json();
       await ghFetch('https://api.github.com/repos/' + OWNER + '/' + REPO + '/contents/' + PHOTOS_JSON,
         { method: 'PUT', body: JSON.stringify({ message: 'Remove photo: ' + p.title, content: btoa(JSON.stringify({ photos: photos }, null, 2)), sha: jdata.sha, branch: BRANCH }) });
       showToast('Photo deleted');
@@ -426,7 +530,7 @@
 
   function fileToBase64(file) {
     return new Promise(function(resolve, reject) {
-      const r = new FileReader();
+      var r = new FileReader();
       r.onload = function() { resolve(r.result.split(',')[1]); };
       r.onerror = reject;
       r.readAsDataURL(file);
@@ -446,7 +550,7 @@
 
   var toastTimer;
   function showToast(msg, isErr) {
-    const t = document.getElementById('toast');
+    var t = document.getElementById('toast');
     t.textContent = msg;
     t.className = 'show' + (isErr ? ' err' : '');
     clearTimeout(toastTimer);
